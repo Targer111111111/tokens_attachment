@@ -30,8 +30,8 @@ OBR.onReady(() => {
                 {
                     width: explosionSize,
                     height: explosionSize,
-                    // Замени эту ссылку на свой PNG-файл огня
-                    url: "https://tvoy-github.github.io/repo-name/fire-sphere.png", 
+                    // Скрипт сам подставит домен GitHub и путь к папке
+                    url: new URL("fire_sphere.png", window.location.href).href, 
                     mime: "image/png",
                 },
                 { 

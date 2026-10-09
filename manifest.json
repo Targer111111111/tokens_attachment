@@ -2,8 +2,10 @@
   "name": "Interactive Props",
   "version": "1.0.0",
   "manifest_version": 1,
-  "author": "Tvoy Nickname",
-  "background": {
-    "url": "/"
+  "author": "Tartar",
+  "action": {
+    "title": "Props System",
+    "icon": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Simple_Light_Bulb_Icon.svg",
+    "popover": "/"
   }
 }
