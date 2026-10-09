@@ -1,0 +1,9 @@
+{
+  "name": "Interactive Props",
+  "version": "1.0.0",
+  "manifest_version": 1,
+  "author": "Tvoy Nickname",
+  "background": {
+    "url": "/"
+  }
+}
