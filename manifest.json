@@ -5,9 +5,9 @@
   "author": "Tartar",
   "icon": "https://cdn-icons-png.flaticon.com/512/346/346904.png",
   "action": {
-    "title": "https://targer111111111.github.io/tokens_attachment/index.html",
+    "title": "Props Interact",
     "icon": "https://cdn-icons-png.flaticon.com/512/346/346904.png",
-    "popover": "/", 
+    "popover": "https://targer111111111.github.io/tokens_attachment/index.html", 
     "width": 300,
     "height": 250
   }
