@@ -17,10 +17,10 @@ OBR.onReady(() => {
         async onClick(context) {
             const token = context.items[0];
 
-            if (!token.name.toLowerCase().includes("#boom")) {
-                OBR.notification.show("Этот объект не является взрывоопасным!");
-                return;
-            }
+        if (!token.name || !token.name.toLowerCase().includes("#boom")) {
+            OBR.notification.show("Этот объект не является взрывоопасным!");
+            return;
+        }
 
             const position = token.position;
             const dpi = await OBR.scene.grid.getDpi();
