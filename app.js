@@ -2,7 +2,7 @@ import OBR, { buildImage } from "https://esm.sh/@owlbear-rodeo/sdk";
 
 OBR.onReady(() => {
     OBR.contextMenu.create({
-        id: "detonate-barrel",
+        id: "tartar-props/detonate-barrel", 
         icons: [
             {
                 // Для теста можешь использовать любую картинку из сети, 
