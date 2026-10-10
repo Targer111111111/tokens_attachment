@@ -52,7 +52,7 @@ OBR.onReady(() => {
         .build();
 
         // Удаляем старый токен и добавляем сферу огня
-        await OBR.scene.items.delete([token.id]);
+        await OBR.scene.items.deleteItems([token.id]);
         await OBR.scene.items.addItems([fireSphere]);
         
         // Пишем об успехе (по желанию)
