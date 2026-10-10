@@ -1,13 +1,13 @@
 {
   "name": "Interactive Props",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "manifest_version": 1,
   "author": "Tartar",
   "icon": "https://cdn-icons-png.flaticon.com/512/346/346904.png",
   "action": {
-    "title": "Props Interact",
+    "title": "https://targer111111111.github.io/tokens_attachment/index.html",
     "icon": "https://cdn-icons-png.flaticon.com/512/346/346904.png",
-    "popover": "https://targer111111111.github.io/index.html", 
+    "popover": "/", 
     "width": 300,
     "height": 250
   }
