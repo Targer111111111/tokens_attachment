@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "manifest_version": 1,
   "author": "Tartar",
-  "icon": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Simple_Light_Bulb_Icon.svg",
+  "icon": "https://cdn-icons-png.flaticon.com/512/346/346904.png",
   "background": {
     "url": "/"
   }
