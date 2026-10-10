@@ -31,24 +31,36 @@ OBR.onReady(() => {
         // Логика взрыва
         const position = token.position;
         const dpi = await OBR.scene.grid.getDpi();
-        const explosionSize = dpi * 5; 
+        
+        // ВАЖНО: Проверьте свойства вашего файла fire_sphere.png на компьютере.
+        // Запишите сюда его точную ширину и высоту в пикселях!
+        // Я использую 512 для примера.
+        const imgWidth = 512;  
+        const imgHeight = 512; 
+
+        // Вычисляем, во сколько раз нужно увеличить картинку, чтобы она стала размером 5х5 клеток
+        const targetSize = dpi * 5; 
+        const scaleX = targetSize / imgWidth;
+        const scaleY = targetSize / imgHeight;
 
         const fireSphere = buildImage(
             {
-                width: explosionSize,
-                height: explosionSize,
+                width: imgWidth,
+                height: imgHeight,
                 url: new URL("fire_sphere.png", window.location.href).href, 
                 mime: "image/png",
             },
             { 
                 dpi: dpi, 
-                offset: { x: explosionSize / 2, y: explosionSize / 2 } 
+                // Центрируем именно по реальным размерам исходной картинки
+                offset: { x: imgWidth / 2, y: imgHeight / 2 } 
             }
         )
         .position(position)
+        .scale({ x: scaleX, y: scaleY }) // Растягиваем до 5 клеток
         .layer("ATTACHMENT")
         .name("Fire Effect")
-        .locked(true) // Блокируем, чтобы случайно не сдвинуть взрыв
+        .locked(true) 
         .build();
 
         // Удаляем старый токен и добавляем сферу огня
