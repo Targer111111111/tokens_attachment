@@ -71,4 +71,16 @@ OBR.onReady(() => {
         statusText.innerText = "BOOM!";
         statusText.style.color = "#4CAF50"; // Зеленый цвет для успеха
     });
+    
+    // Слушатель нажатий клавиатуры
+    document.addEventListener("keydown", (event) => {
+        // Проверяем, зажата ли клавиша Alt и нажата ли клавиша Q
+        // Используем event.code === "KeyQ", чтобы хоткей работал даже при русской раскладке (Alt + Й)
+        if (event.altKey && event.code === "KeyQ") {
+            // Предотвращаем стандартное поведение браузера для этой комбинации (на всякий случай)
+            event.preventDefault(); 
+            // Имитируем клик по нашей зеленой кнопке
+            button.click(); 
+        }
+    });
 });
