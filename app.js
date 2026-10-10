@@ -61,6 +61,7 @@ OBR.onReady(() => {
         .layer("ATTACHMENT")
         .name("Fire Effect")
         .locked(true) 
+        .opacity(0.7)
         .build();
 
         // Удаляем старый токен и добавляем сферу огня
