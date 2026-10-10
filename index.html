@@ -3,9 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Props Extension</title>
+    <style>
+        body {
+            /* Выравниваем всё по центру */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #242424; /* Темный фон под стиль OBR */
+            font-family: sans-serif;
+        }
+        #status-text {
+            height: 20px; /* Фиксированная высота, чтобы кнопка не прыгала */
+            margin-bottom: 10px;
+            color: #ff5555; /* Красный цвет для ошибки */
+            font-size: 14px;
+        }
+        #interact-btn {
+            width: 120px;
+            height: 120px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        #interact-btn:hover {
+            background-color: #45a049;
+        }
+        #interact-btn:active {
+            transform: scale(0.95); /* Эффект нажатия */
+        }
+    </style>
 </head>
 <body>
-    <!-- Подключаем скрипт как модуль, чтобы работали импорты -->
+    <!-- Текст над кнопкой -->
+    <div id="status-text"></div>
+    
+    <!-- Сама квадратная кнопка -->
+    <button id="interact-btn">Interact</button>
+
+    <!-- Подключаем скрипт -->
     <script type="module" src="./app.js"></script>
 </body>
 </html>
