@@ -23,7 +23,7 @@ OBR.onReady(() => {
         id: "tartar-props-boom-menu",
         icons: [
             {
-                icon: "https://media.discordapp.net/attachments/1463436986219237377/1559166107678543902/cursor_icon.png?ex=6ace1617&is=6accc497&hm=36a6486a38b4608ff54b0b2e02b813c684c87dce3cd58b8e487e14d1c7f69bed&=&format=webp&quality=lossless",
+                icon: "https://media.discordapp.net/attachments/1463436986219237377/1559173487346720788/cursor_outline_icon.png?ex=6ace1cf7&is=6acccb77&hm=3f06198c4f1f897ffe0a42b73a754c758895bdbc5d72faed4baca2c5b6e8cafb&=&format=webp&quality=lossless",
                 label: "Interact",
                 filter: {
                     every: [
