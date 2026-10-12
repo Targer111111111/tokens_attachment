@@ -62,8 +62,8 @@ OBR.onReady(() => {
                 console.log(`Взорвана бомба! Amount: ${amount}, Dice: d${dice}, Mod: ${mod}`);
                 console.log(`Урон: ${currentDamage}`);
 
-                const imgWidth = 306;  
-                const imgHeight = 306; 
+                const imgWidth = 320;  
+                const imgHeight = 320; 
                 const targetSize = bombRadius * 2; 
                 const scaleX = targetSize / imgWidth;
                 const scaleY = targetSize / imgHeight;
