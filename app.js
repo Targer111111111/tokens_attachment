@@ -1,5 +1,23 @@
 import OBR, { buildImage } from "https://esm.sh/@owlbear-rodeo/sdk";
 
+// Функция для расшифровки скрытых характеристик из поля Description
+function parseTokenStats(textString) {
+    const stats = {};
+    if (!textString) return stats;
+
+    // Ищет буквы, знак равно и числа (в том числе дробные, например radius=1.5)
+    const regex = /([a-zA-Z_]+)\s*=\s*(-?\d+(?:\.\d+)?)/g;
+    
+    let match;
+    while ((match = regex.exec(textString)) !== null) {
+        const key = match[1]; 
+        const value = parseFloat(match[2]); 
+        stats[key] = value;
+    }
+    
+    return stats;
+}
+
 OBR.onReady(() => {
     OBR.contextMenu.create({
         id: "tartar-props-boom-menu",
@@ -17,38 +35,49 @@ OBR.onReady(() => {
         onClick: async (context) => {
             const initialToken = context.items[0];
 
-            // Проверяем, есть ли у токена нужное имя
             if (!initialToken || !initialToken.name || !initialToken.name.toLowerCase().includes("explosion_element_icon")) {
                 return;
             }
 
-            // Получаем ВСЕ объекты на карте один раз, чтобы искать среди них цели
             const allItems = await OBR.scene.items.getItems();
-            
             const dpi = await OBR.scene.grid.getDpi();
-            const radius = dpi * 2.5; // Радиус поражения: 2.5 клетки от центра (для взрыва 5х5)
             
-            const itemsToDelete = new Set(); // Set не позволяет добавить один и тот же ID дважды
+            // Базовый радиус, если он не указан в описании (2.5 клетки = взрыв 5х5)
+            const defaultRadius = dpi * 2.5; 
+            
+            const itemsToDelete = new Set(); 
             const explosionsToAdd = [];
             
-            // Очередь бомб, которые должны взорваться
             const explosionQueue = [initialToken];
 
-            // Пока в очереди есть бомбы — продолжаем цепную реакцию
             while (explosionQueue.length > 0) {
-                // Достаем первую бомбу из очереди
                 const currentBomb = explosionQueue.shift();
 
-                // Если эта бомба уже взорвалась ранее (защита от бесконечного цикла)
                 if (itemsToDelete.has(currentBomb.id)) continue;
-                
-                // Отмечаем текущую бомбу на удаление
                 itemsToDelete.add(currentBomb.id);
 
-                // --- 1. СОЗДАЕМ КАРТИНКУ ВЗРЫВА ДЛЯ ТЕКУЩЕЙ БОМБЫ ---
+                // --- НОВОЕ: Считываем скрытые переменные из поля Description ---
+                // Обращаемся к description вместо видимого текста
+                const tokenText = currentBomb.description || ""; 
+                const variables = parseTokenStats(tokenText);
+                
+                // Пример того, как вытаскивать переменные на будущее:
+                const damageAmount = variables.d !== undefined ? variables.d : 0;
+                const a = variables.a !== undefined ? variables.a : 0;
+                const m = variables.m !== undefined ? variables.m : 0;
+                
+                // Динамический радиус. Задали radius=1.5 в описании — взрыв стал меньше!
+                const bombRadius = variables.radius !== undefined ? (dpi * variables.radius) : defaultRadius;
+                
+                // Выводим в консоль браузера (F12), чтобы вы могли проверить, что всё сработало
+                console.log(`Взорвана бомба! Урон: ${damageAmount}, a: ${a}, m: ${m}, Радиус: ${bombRadius / dpi} клеток`);
+
+                // --- 1. СОЗДАЕМ КАРТИНКУ ВЗРЫВА ---
                 const imgWidth = 306;  
                 const imgHeight = 306; 
-                const targetSize = dpi * 5; 
+                
+                // Высчитываем размер визуального взрыва под радиус конкретно этой бомбы
+                const targetSize = bombRadius * 2; 
                 const scaleX = targetSize / imgWidth;
                 const scaleY = targetSize / imgHeight;
 
@@ -69,30 +98,24 @@ OBR.onReady(() => {
                 .layer("ATTACHMENT")
                 .name("Fire Effect")
                 .locked(true) 
-                // .opacity(0.7) <-- Если используете прозрачность внутри кода, верните эту строку (но помните про ошибку OBR, лучше делать картинку прозрачной)
                 .build();
 
                 explosionsToAdd.push(fireSphere);
 
                 // --- 2. ИЩЕМ ОБЪЕКТЫ В РАДИУСЕ ПОРАЖЕНИЯ ---
                 for (const item of allItems) {
-                    // Если объект уже приговорен к удалению, пропускаем его
                     if (itemsToDelete.has(item.id)) continue;
 
                     const itemName = item.name ? item.name.toLowerCase() : "";
 
-                    // Вычисляем расстояние от центра бомбы до центра объекта по теореме Пифагора
                     const dx = item.position.x - currentBomb.position.x;
                     const dy = item.position.y - currentBomb.position.y;
                     const distance = Math.hypot(dx, dy);
 
-                    // Если объект находится в зоне взрыва (в круге с радиусом 2.5 клетки)
-                    if (distance <= radius) {
-                        // Если это другая бомба — добавляем её в очередь на взрыв!
+                    if (distance <= bombRadius) {
                         if (itemName.includes("explosion_element_icon")) {
                             explosionQueue.push(item);
                         } 
-                        // Если это разрушаемый объект (куб или куб на колесах) — просто удаляем
                         else if (itemName.includes("cube_icon") || itemName.includes("cube_icon_on_wheels")) {
                             itemsToDelete.add(item.id);
                         }
@@ -100,7 +123,6 @@ OBR.onReady(() => {
                 }
             }
 
-            // Применяем все изменения разом: удаляем все затронутые объекты и спавним все эффекты огня
             await OBR.scene.items.deleteItems(Array.from(itemsToDelete));
             await OBR.scene.items.addItems(explosionsToAdd);
         }
