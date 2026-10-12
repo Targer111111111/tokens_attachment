@@ -5,7 +5,7 @@ function parseTokenStats(textString) {
     const stats = {};
     if (!textString) return stats;
 
-    // Ищет буквы, знак равно и числа (в том числе дробные, например radius=1.5)
+    // Ищет слова (буквы), знак равно и числа (в том числе дробные, например radius=1.5)
     const regex = /([a-zA-Z_]+)\s*=\s*(-?\d+(?:\.\d+)?)/g;
     
     let match;
@@ -56,27 +56,39 @@ OBR.onReady(() => {
                 if (itemsToDelete.has(currentBomb.id)) continue;
                 itemsToDelete.add(currentBomb.id);
 
-                // --- НОВОЕ: Считываем скрытые переменные из поля Description ---
-                // Обращаемся к description вместо видимого текста
+                // --- Считываем скрытые переменные из поля Description ---
                 const tokenText = currentBomb.description || ""; 
                 const variables = parseTokenStats(tokenText);
                 
-                // Пример того, как вытаскивать переменные на будущее:
-                const damageAmount = variables.d !== undefined ? variables.d : 0;
-                const a = variables.a !== undefined ? variables.a : 0;
-                const m = variables.m !== undefined ? variables.m : 0;
+                // Достаем обновленные переменные: amount, dice, mod
+                const amount = variables.amount !== undefined ? variables.amount : 0;
+                const dice = variables.dice !== undefined ? variables.dice : 0;
+                const mod = variables.mod !== undefined ? variables.mod : 0;
                 
-                // Динамический радиус. Задали radius=1.5 в описании — взрыв стал меньше!
+                // Динамический радиус
                 const bombRadius = variables.radius !== undefined ? (dpi * variables.radius) : defaultRadius;
                 
-                // Выводим в консоль браузера (F12), чтобы вы могли проверить, что всё сработало
-                console.log(`Взорвана бомба! Урон: ${damageAmount}, a: ${a}, m: ${m}, Радиус: ${bombRadius / dpi} клеток`);
+                // --- НОВОЕ: ПОДСЧЕТ УРОНА ---
+                const maxDamage = (amount * dice) + mod;
+                const minDamage = amount + mod;
+                
+                let currentDamage = 0;
+                // Защита от ошибки (если переменные не заданы или dice = 0)
+                if (maxDamage >= minDamage) {
+                    // Выдает случайное целое число между minDamage и maxDamage включительно
+                    currentDamage = Math.floor(Math.random() * (maxDamage - minDamage + 1)) + minDamage;
+                } else {
+                    currentDamage = minDamage;
+                }
+
+                // Выводим в консоль браузера для проверки
+                console.log(`Взорвана бомба! Amount: ${amount}, Dice: d${dice}, Mod: ${mod}, Радиус: ${bombRadius / dpi} клеток`);
+                console.log(`Урон: мин = ${minDamage}, макс = ${maxDamage} ---> Выпало: ${currentDamage}`);
 
                 // --- 1. СОЗДАЕМ КАРТИНКУ ВЗРЫВА ---
                 const imgWidth = 306;  
                 const imgHeight = 306; 
                 
-                // Высчитываем размер визуального взрыва под радиус конкретно этой бомбы
                 const targetSize = bombRadius * 2; 
                 const scaleX = targetSize / imgWidth;
                 const scaleY = targetSize / imgHeight;
@@ -112,12 +124,45 @@ OBR.onReady(() => {
                     const dy = item.position.y - currentBomb.position.y;
                     const distance = Math.hypot(dx, dy);
 
+                    // Если объект оказался в радиусе взрыва
                     if (distance <= bombRadius) {
+                        
+                        // Если это другая бомба
                         if (itemName.includes("explosion_element_icon")) {
                             explosionQueue.push(item);
                         } 
+                        // Если это ящик
                         else if (itemName.includes("cube_icon") || itemName.includes("cube_icon_on_wheels")) {
                             itemsToDelete.add(item.id);
+                        }
+                        
+                        // ---> ВОТ ЗДЕСЬ МЫ НАНОСИМ УРОН ОСТАЛЬНЫМ <---
+                        else {
+                            // Предполагаемый ключ метаданных аддона Stat Bubbles
+                            const bubblesId = "com.seamusfinlayson.bubbles"; 
+
+                            // Проверяем, привязано ли к этому токену здоровье
+                            if (item.metadata[bubblesId] !== undefined && item.metadata[bubblesId].hp !== undefined) {
+                                
+                                // Безопасно обновляем токен для всех игроков
+                                OBR.scene.items.updateItems([item.id], (tokensToUpdate) => {
+                                    for (let t of tokensToUpdate) {
+                                        // Читаем текущее ХП
+                                        let currentHp = t.metadata[bubblesId].hp;
+                                        
+                                        // Отнимаем урон от нашего взрыва
+                                        currentHp = currentHp - currentDamage;
+                                        
+                                        // Не даем здоровью уйти в отрицательные значения
+                                        if (currentHp < 0) currentHp = 0; 
+                                        
+                                        // Перезаписываем ХП
+                                        t.metadata[bubblesId].hp = currentHp;
+                                    }
+                                });
+
+                                console.log(`Токен ${itemName || "Без имени"} получил ${currentDamage} урона!`);
+                            }
                         }
                     }
                 }
