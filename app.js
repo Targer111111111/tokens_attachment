@@ -139,7 +139,7 @@ OBR.onReady(() => {
                         // ---> ВОТ ЗДЕСЬ МЫ НАНОСИМ УРОН ОСТАЛЬНЫМ <---
                         else {
                             // Предполагаемый ключ метаданных аддона Stat Bubbles
-                            const bubblesId = "com.seamusfinlayson.bubbles"; 
+                            const bubblesId = "com.owlbear-rodeo-bubbles-extension/metadata"; 
 
                             // Проверяем, привязано ли к этому токену здоровье
                             if (item.metadata[bubblesId] !== undefined && item.metadata[bubblesId].hp !== undefined) {
