@@ -28,8 +28,8 @@ OBR.onReady(() => {
             const position = token.position;
             const dpi = await OBR.scene.grid.getDpi();
             
-            const imgWidth = 306;  
-            const imgHeight = 306; 
+            const imgWidth = 320;  
+            const imgHeight = 320; 
 
             const targetSize = dpi * 5; 
             const scaleX = targetSize / imgWidth;
