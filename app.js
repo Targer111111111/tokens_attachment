@@ -7,7 +7,7 @@ OBR.onReady(() => {
         icons: [
             {
                 icon: "https://cdn-icons-png.flaticon.com/512/346/346904.png",
-                label: "Detonate (BOOM)",
+                label: "Interact",
                 filter: {
                     every: [
                         { key: "type", value: "IMAGE" } 
@@ -20,7 +20,7 @@ OBR.onReady(() => {
             const token = context.items[0]; 
 
             // Проверяем, есть ли у токена имя и содержит ли оно #boom
-            if (!token || !token.name || !token.name.toLowerCase().includes("#boom")) {
+            if (!token || !token.name || !token.name.toLowerCase().includes("explosion_element_icon")) {
                 return; // Если тега нет — ничего не делаем
             }
 
