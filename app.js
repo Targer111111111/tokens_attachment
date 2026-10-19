@@ -42,7 +42,7 @@ OBR.onReady(() => {
         id: "tartar-props-boom-menu",
         icons: [
             {
-                icon: "https://ibb.co/JWm6rLfd",
+                icon: "https://cdn.discordapp.com/attachments/1463436986219237377/1559173487346720788/cursor_outline_icon.png?ex=6ad75777&is=6ad605f7&hm=a4dfb900638e19bbaf18a2a9f3faaf9b55b47508f7dfc09c2919491a3838fb17",
                 label: "Interact",
                 filter: {
                     every: [
