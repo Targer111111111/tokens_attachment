@@ -111,7 +111,7 @@ OBR.onReady(() => {
 
                 setTimeout(async () => {
                     await OBR.scene.items.deleteItems([electroSphere.id]);
-                }, 4000);
+                }, 3200);
 
                 // 2. Ищем существ с хотбаром ХП в радиусе поражения
                 const targetsToDamage = [];
