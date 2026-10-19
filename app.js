@@ -42,7 +42,7 @@ OBR.onReady(() => {
         id: "tartar-props-boom-menu",
         icons: [
             {
-                icon: "https://media.discordapp.net/attachments/1463436986219237377/1559173487346720788/cursor_outline_icon.png?ex=6ace1cf7&is=6acccb77&hm=3f06198c4f1f897ffe0a42b73a754c758895bdbc5d72faed4baca2c5b6e8cafb&=&format=webp&quality=lossless",
+                icon: "https://ibb.co/JWm6rLfd",
                 label: "Interact",
                 filter: {
                     every: [
@@ -87,12 +87,18 @@ OBR.onReady(() => {
                 const scaleX = targetSize / imgWidth;
                 const scaleY = targetSize / imgHeight;
 
+                const imgWidth = 320;  
+                const imgHeight = 320; 
+                const targetSize = teslaRadius * 2;
+                const scaleX = targetSize / imgWidth;
+                const scaleY = targetSize / imgHeight;
+
                 const electroSphere = buildImage(
                     {
                         width: imgWidth,
                         height: imgHeight,
-                        url: new URL("electro_sphere.png", window.location.href).href,
-                        mime: "image/png",
+                        url: new URL("electro_sphere.gif", window.location.href).href, 
+                        mime: "image/gif", 
                     },
                     {
                         dpi: dpi,
@@ -110,7 +116,7 @@ OBR.onReady(() => {
 
                 setTimeout(async () => {
                     await OBR.scene.items.deleteItems([electroSphere.id]);
-                }, 4000); 
+                }, 4000);
 
                 // 2. Ищем существ с хотбаром ХП в радиусе поражения
                 const targetsToDamage = [];
