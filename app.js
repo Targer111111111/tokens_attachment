@@ -81,11 +81,6 @@ OBR.onReady(() => {
                 console.log(`Урон: мин = ${minDamage}, макс = ${maxDamage} ---> Выпало: ${currentDamage}`);
 
                 // 1. Создаем картинку электро-сферы
-                const imgWidth = 306;
-                const imgHeight = 306;
-                const targetSize = teslaRadius * 2;
-                const scaleX = targetSize / imgWidth;
-                const scaleY = targetSize / imgHeight;
 
                 const imgWidth = 320;  
                 const imgHeight = 320; 
