@@ -5,7 +5,6 @@ function parseTokenStats(textString) {
     const stats = {};
     if (!textString) return stats;
 
-    // Ищет слова (буквы), знак равно и числа (в том числе дробные, например radius=1.5)
     const regex = /([a-zA-Z_]+)\s*=\s*(-?\d+(?:\.\d+)?)/g;
     
     let match;
@@ -59,7 +58,6 @@ OBR.onReady(() => {
             const isBomb = initialName.includes("explosion_element_icon");
             const isTesla = initialName.includes("tesla_element_icon_on");
 
-            // Если это ни бочка, ни катушка Теслы — ничего не делаем
             if (!isBomb && !isTesla) return;
 
             const allItems = await OBR.scene.items.getItems();
@@ -68,7 +66,7 @@ OBR.onReady(() => {
             const bubblesId = "com.owlbear-rodeo-bubbles-extension/metadata";
 
             // ==========================================
-            // ЛОГИКА КАТУШКИ ТЕСЛЫ (не ломает блоки и не исчезает)
+            // ЛОГИКА КАТУШКИ ТЕСЛЫ
             // ==========================================
             if (isTesla) {
                 const tokenText = initialToken.description || "";
@@ -76,11 +74,6 @@ OBR.onReady(() => {
                 const teslaRadius = variables.radius !== undefined ? (dpi * variables.radius) : defaultRadius;
                 
                 const { currentDamage, minDamage, maxDamage, amount, dice, mod } = calculateDamage(variables);
-
-                console.log(`Разряд катушки Теслы! Amount: ${amount}, Dice: d${dice}, Mod: ${mod}, Радиус: ${teslaRadius / dpi} клеток`);
-                console.log(`Урон: мин = ${minDamage}, макс = ${maxDamage} ---> Выпало: ${currentDamage}`);
-
-                // 1. Создаем картинку электро-сферы
 
                 const imgWidth = 320;  
                 const imgHeight = 320; 
@@ -113,25 +106,58 @@ OBR.onReady(() => {
                     await OBR.scene.items.deleteItems([electroSphere.id]);
                 }, 3200);
 
-                // 2. Ищем существ с хотбаром ХП в радиусе поражения
+                // Ищем цели
                 const targetsToDamage = [];
+                const teslaItemsToDelete = [];
+                const teslaItemsToAdd = [];
 
                 for (const item of allItems) {
                     if (item.id === initialToken.id) continue;
 
+                    const itemName = item.name ? item.name.toLowerCase() : "";
                     const dx = item.position.x - initialToken.position.x;
                     const dy = item.position.y - initialToken.position.y;
                     const distance = Math.hypot(dx, dy);
 
                     if (distance <= teslaRadius) {
-                        if (item.metadata[bubblesId] !== undefined && item.metadata[bubblesId].health !== undefined) {
+                        // 1. Активация выключенной катушки
+                        if (itemName.includes("tesla_element_icon_off")) {
+                            teslaItemsToDelete.push(item.id);
+                            
+                            // Задаем разрешение вашей текстуры tesla_on.png (обычно 512x512)
+                            const texWidth = 320;
+                            const texHeight = 320;
+
+                            const newTeslaToken = buildImage(
+                                {
+                                    width: texWidth,
+                                    height: texHeight,
+                                    url: new URL("tesla_on.png", window.location.href).href, 
+                                    mime: "image/png",
+                                },
+                                {
+                                    dpi: dpi,
+                                    offset: { x: texWidth / 2, y: texHeight / 2 }
+                                }
+                            )
+                            .position(item.position)
+                            // Масштаб (dpi / texWidth) делает токен ровно 1х1 клетку
+                            .scale({ x: dpi / texWidth, y: dpi / texHeight })
+                            .layer("PROP") 
+                            .name("tesla_element_icon_on")
+                            .description(item.description) // Копируем статы из выключенной катушки
+                            .build();
+
+                            teslaItemsToAdd.push(newTeslaToken);
+                        }
+                        // 2. Нанесение урона
+                        else if (item.metadata[bubblesId] !== undefined && item.metadata[bubblesId].health !== undefined) {
                             targetsToDamage.push(item.id);
-                            console.log(`Токен ${item.name || "Без имени"} получил ${currentDamage} урона электричеством!`);
                         }
                     }
                 }
 
-                // Наносим урон всем найденным целям
+                // Применяем изменения для катушки Теслы
                 if (targetsToDamage.length > 0) {
                     await OBR.scene.items.updateItems(targetsToDamage, (tokensToUpdate) => {
                         for (let t of tokensToUpdate) {
@@ -143,11 +169,18 @@ OBR.onReady(() => {
                     });
                 }
 
+                if (teslaItemsToDelete.length > 0) {
+                    await OBR.scene.items.deleteItems(teslaItemsToDelete);
+                }
+                if (teslaItemsToAdd.length > 0) {
+                    await OBR.scene.items.addItems(teslaItemsToAdd);
+                }
+
                 return;
             }
 
             // ==========================================
-            // ЛОГИКА ВЗРЫВНОЙ БОЧКИ (оригинальная)
+            // ЛОГИКА ВЗРЫВНОЙ БОЧКИ
             // ==========================================
             const itemsToDelete = new Set(); 
             const explosionsToAdd = [];
@@ -164,9 +197,6 @@ OBR.onReady(() => {
                 const bombRadius = variables.radius !== undefined ? (dpi * variables.radius) : defaultRadius;
                 
                 const { currentDamage, minDamage, maxDamage, amount, dice, mod } = calculateDamage(variables);
-
-                console.log(`Взорвана бомба! Amount: ${amount}, Dice: d${dice}, Mod: ${mod}, Радиус: ${bombRadius / dpi} клеток`);
-                console.log(`Урон: мин = ${minDamage}, макс = ${maxDamage} ---> Выпало: ${currentDamage}`);
 
                 const imgWidth = 306;  
                 const imgHeight = 306; 
@@ -194,12 +224,10 @@ OBR.onReady(() => {
                 .build();
 
                 explosionsToAdd.push(fireSphere);
-
                 for (const item of allItems) {
                     if (itemsToDelete.has(item.id)) continue;
 
                     const itemName = item.name ? item.name.toLowerCase() : "";
-
                     const dx = item.position.x - currentBomb.position.x;
                     const dy = item.position.y - currentBomb.position.y;
                     const distance = Math.hypot(dx, dy);
@@ -221,14 +249,11 @@ OBR.onReady(() => {
                                         t.metadata[bubblesId].health = currentHp;
                                     }
                                 });
-
-                                console.log(`Токен ${itemName || "Без имени"} получил ${currentDamage} урона!`);
                             }
                         }
                     }
                 }
             }
-
             await OBR.scene.items.deleteItems(Array.from(itemsToDelete));
             await OBR.scene.items.addItems(explosionsToAdd);
         }
