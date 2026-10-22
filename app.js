@@ -132,7 +132,7 @@ OBR.onReady(() => {
                                 {
                                     width: texWidth,
                                     height: texHeight,
-                                    url: new URL("tesla_on.png", window.location.href).href, 
+                                    url: new URL("tesla_element_icon_on.png", window.location.href).href, 
                                     mime: "image/png",
                                 },
                                 {
