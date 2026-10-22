@@ -104,7 +104,7 @@ OBR.onReady(() => {
 
                 setTimeout(async () => {
                     await OBR.scene.items.deleteItems([electroSphere.id]);
-                }, 2600);
+                }, 1600);
 
                 // Ищем цели
                 const targetsToDamage = [];
