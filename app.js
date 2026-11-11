@@ -44,7 +44,8 @@ OBR.onReady(() => {
         id: "tartar-props-boom-menu",
         icons: [
             {
-                icon: "https://media.discordapp.net/attachments/1463436986219237377/1559173487346720788/cursor_outline_icon.png?ex=6af306f7&is=6af1b577&hm=2a164b5ba6886127ff35516128d3eb22ea6a740ceab6c21c557b906df9f72a98&=&format=webp&quality=lossless",
+                // Иконка из папки media
+                icon: new URL("media/cursor_outline_icon.png", window.location.href).href,
                 label: "Interact",
                 filter: {
                     every: [ { key: "type", value: "IMAGE" } ]
@@ -84,7 +85,7 @@ OBR.onReady(() => {
                     {
                         width: imgWidth,
                         height: imgHeight,
-                        url: new URL("electro_sphere.gif", window.location.href).href, 
+                        url: new URL("media/electro_sphere.gif", window.location.href).href, // Обновленный путь
                         mime: "image/gif", 
                     },
                     {
@@ -128,7 +129,7 @@ OBR.onReady(() => {
                                 {
                                     width: texWidth,
                                     height: texHeight,
-                                    url: new URL("tesla_element_icon_on.png", window.location.href).href, 
+                                    url: new URL("media/tesla_element_icon_on.png", window.location.href).href, // Обновленный путь
                                     mime: "image/png",
                                 },
                                 {
@@ -198,7 +199,7 @@ OBR.onReady(() => {
                     {
                         width: imgWidth,
                         height: imgHeight,
-                        url: new URL("fire_sphere.png", window.location.href).href, 
+                        url: new URL("media/fire_sphere.png", window.location.href).href, // Обновленный путь
                         mime: "image/png",
                     },
                     { 
@@ -256,7 +257,8 @@ OBR.onReady(() => {
         id: "tartar-props-grow-menu",
         icons: [
             {
-                icon: "https://media.discordapp.net/attachments/1463436986219237377/1559173487346720788/cursor_outline_icon.png?ex=6af306f7&is=6af1b577&hm=2a164b5ba6886127ff35516128d3eb22ea6a740ceab6c21c557b906df9f72a98&=&format=webp&quality=lossless",
+                // Новая иконка листика для садоводства
+                icon: new URL("media/grow_icon.png", window.location.href).href,
                 label: "Grow",
                 filter: {
                     every: [ { key: "type", value: "IMAGE" } ]
@@ -270,8 +272,8 @@ OBR.onReady(() => {
             const initialName = initialToken.name.toLowerCase();
             const dpi = await OBR.scene.grid.getDpi();
 
-            const texWidth = 224;
-            const texHeight = 224;
+            const texWidth = 320;
+            const texHeight = 320;
 
             // -------------------------------------------------------------------
             // БАМБУК (bamboo -> bamboo_young -> bamboo_grow)
@@ -281,7 +283,7 @@ OBR.onReady(() => {
                     {
                         width: texWidth,
                         height: texHeight,
-                        url: new URL("bamboo_young.png", window.location.href).href,
+                        url: new URL("media/bamboo_young.png", window.location.href).href, // Обновленный путь
                         mime: "image/png",
                     },
                     {
@@ -293,7 +295,7 @@ OBR.onReady(() => {
                 .scale({ x: dpi / texWidth, y: dpi / texHeight })
                 .layer("PROP")
                 .name("bamboo_young")
-                .description("st=1 com=22 mod=0")
+                .description("st=3 com=30 mod=0")
                 .build();
 
                 await OBR.scene.items.deleteItems([initialToken.id]);
@@ -327,7 +329,7 @@ OBR.onReady(() => {
                         {
                             width: texWidth,
                             height: texHeight,
-                            url: new URL("bamboo_grow.png", window.location.href).href,
+                            url: new URL("media/bamboo_grow.png", window.location.href).href, // Обновленный путь
                             mime: "image/png",
                         },
                         {
@@ -346,7 +348,6 @@ OBR.onReady(() => {
                     await OBR.scene.items.addItems([bambooGrow]);
                     console.log("Успех! Росток превратился в bamboo_grow");
                 } else {
-                    // Увеличиваем mod на 4 при неудаче
                     const newMod = mod + 4;
                     await OBR.scene.items.updateItems([initialToken.id], (items) => {
                         for (let item of items) {
@@ -366,7 +367,7 @@ OBR.onReady(() => {
                     {
                         width: texWidth,
                         height: texHeight,
-                        url: new URL("aloe_young.png", window.location.href).href,
+                        url: new URL("media/aloe_young.png", window.location.href).href, // Обновленный путь
                         mime: "image/png",
                     },
                     {
@@ -378,7 +379,7 @@ OBR.onReady(() => {
                 .scale({ x: dpi / texWidth, y: dpi / texHeight })
                 .layer("PROP")
                 .name("aloe_young")
-                .description("st=1 com=16 mod=0")
+                .description("st=3 com=30 mod=0")
                 .build();
 
                 await OBR.scene.items.deleteItems([initialToken.id]);
@@ -412,7 +413,7 @@ OBR.onReady(() => {
                         {
                             width: texWidth,
                             height: texHeight,
-                            url: new URL("aloe_grow.png", window.location.href).href,
+                            url: new URL("media/aloe_grow.png", window.location.href).href, // Обновленный путь
                             mime: "image/png",
                         },
                         {
@@ -431,7 +432,6 @@ OBR.onReady(() => {
                     await OBR.scene.items.addItems([aloeGrow]);
                     console.log("Успех! Росток превратился в aloe_grow");
                 } else {
-                    // Увеличиваем mod на 4 при неудаче
                     const newMod = mod + 4;
                     await OBR.scene.items.updateItems([initialToken.id], (items) => {
                         for (let item of items) {
