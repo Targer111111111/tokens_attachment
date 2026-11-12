@@ -272,8 +272,8 @@ OBR.onReady(() => {
             const initialName = initialToken.name.toLowerCase();
             const dpi = await OBR.scene.grid.getDpi();
 
-            const texWidth = 320;
-            const texHeight = 320;
+            const texWidth = 224;
+            const texHeight = 224;
 
             // -------------------------------------------------------------------
             // БАМБУК (bamboo -> bamboo_young -> bamboo_grow)
