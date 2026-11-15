@@ -44,7 +44,6 @@ OBR.onReady(() => {
         id: "tartar-props-boom-menu",
         icons: [
             {
-                // Иконка из папки media
                 icon: new URL("media/cursor_outline_icon.png", window.location.href).href,
                 label: "Interact",
                 filter: {
@@ -73,7 +72,7 @@ OBR.onReady(() => {
                 const variables = parseTokenStats(tokenText);
                 const teslaRadius = variables.radius !== undefined ? (dpi * variables.radius) : defaultRadius;
                 
-                const { currentDamage, minDamage, maxDamage, amount, dice, mod } = calculateDamage(variables);
+                const { currentDamage } = calculateDamage(variables);
 
                 const imgWidth = 320;  
                 const imgHeight = 320; 
@@ -85,7 +84,7 @@ OBR.onReady(() => {
                     {
                         width: imgWidth,
                         height: imgHeight,
-                        url: new URL("media/electro_sphere.gif", window.location.href).href, // Обновленный путь
+                        url: new URL("media/electro_sphere.gif", window.location.href).href,
                         mime: "image/gif", 
                     },
                     {
@@ -129,7 +128,7 @@ OBR.onReady(() => {
                                 {
                                     width: texWidth,
                                     height: texHeight,
-                                    url: new URL("media/tesla_element_icon_on.png", window.location.href).href, // Обновленный путь
+                                    url: new URL("media/tesla_element_icon_on.png", window.location.href).href,
                                     mime: "image/png",
                                 },
                                 {
@@ -187,7 +186,7 @@ OBR.onReady(() => {
                 const variables = parseTokenStats(tokenText);
                 const bombRadius = variables.radius !== undefined ? (dpi * variables.radius) : defaultRadius;
                 
-                const { currentDamage, minDamage, maxDamage, amount, dice, mod } = calculateDamage(variables);
+                const { currentDamage } = calculateDamage(variables);
 
                 const imgWidth = 306;  
                 const imgHeight = 306; 
@@ -199,7 +198,7 @@ OBR.onReady(() => {
                     {
                         width: imgWidth,
                         height: imgHeight,
-                        url: new URL("media/fire_sphere.png", window.location.href).href, // Обновленный путь
+                        url: new URL("media/fire_sphere.png", window.location.href).href,
                         mime: "image/png",
                     },
                     { 
@@ -257,7 +256,6 @@ OBR.onReady(() => {
         id: "tartar-props-grow-menu",
         icons: [
             {
-                // Новая иконка листика для садоводства
                 icon: new URL("media/grow_icon.png", window.location.href).href,
                 label: "Grow",
                 filter: {
@@ -272,18 +270,16 @@ OBR.onReady(() => {
             const initialName = initialToken.name.toLowerCase();
             const dpi = await OBR.scene.grid.getDpi();
 
-            const texWidth = 224;
-            const texHeight = 224;
+            const texWidth = 320;
+            const texHeight = 320;
 
-            // -------------------------------------------------------------------
-            // БАМБУК (bamboo -> bamboo_young -> bamboo_grow)
-            // -------------------------------------------------------------------
+            // --- БАМБУК ---
             if (initialName === "bamboo") {
                 const bambooYoung = buildImage(
                     {
                         width: texWidth,
                         height: texHeight,
-                        url: new URL("media/bamboo_young.png", window.location.href).href, // Обновленный путь
+                        url: new URL("media/bamboo_young.png", window.location.href).href,
                         mime: "image/png",
                     },
                     {
@@ -329,7 +325,7 @@ OBR.onReady(() => {
                         {
                             width: texWidth,
                             height: texHeight,
-                            url: new URL("media/bamboo_grow.png", window.location.href).href, // Обновленный путь
+                            url: new URL("media/bamboo_grow.png", window.location.href).href,
                             mime: "image/png",
                         },
                         {
@@ -359,15 +355,13 @@ OBR.onReady(() => {
                 return;
             }
 
-            // -------------------------------------------------------------------
-            // АЛОЭ (aloe -> aloe_young -> aloe_grow)
-            // -------------------------------------------------------------------
+            // --- АЛОЭ ---
             if (initialName === "aloe") {
                 const aloeYoung = buildImage(
                     {
                         width: texWidth,
                         height: texHeight,
-                        url: new URL("media/aloe_young.png", window.location.href).href, // Обновленный путь
+                        url: new URL("media/aloe_young.png", window.location.href).href,
                         mime: "image/png",
                     },
                     {
@@ -413,7 +407,7 @@ OBR.onReady(() => {
                         {
                             width: texWidth,
                             height: texHeight,
-                            url: new URL("media/aloe_grow.png", window.location.href).href, // Обновленный путь
+                            url: new URL("media/aloe_grow.png", window.location.href).href,
                             mime: "image/png",
                         },
                         {
@@ -442,6 +436,147 @@ OBR.onReady(() => {
                 }
                 return;
             }
+        }
+    });
+
+    // ===================================================================
+    // 3. АВТОПОСАДКА СЕМЯН (соприкосновение с plant_pot_icon)
+    // ===================================================================
+    // Словарь семян: легко добавлять новые растения в будущем
+    const SEED_CONFIG = {
+        "bamboo_shoot": {
+            name: "bamboo_young",
+            image: "media/bamboo_young.png",
+            description: "st=3 com=30 mod=0"
+        },
+        "aloe_seeds": {
+            name: "aloe_young",
+            image: "media/aloe_young.png",
+            description: "st=3 com=30 mod=0"
+        }
+    };
+
+    let isPlanting = false;
+    const processedPotIds = new Set();
+
+    OBR.scene.items.onChange(async (items) => {
+        if (isPlanting || !items || items.length === 0) return;
+
+        // Быстро ищем на сцене пустые горшки и семена
+        const pots = [];
+        const seeds = [];
+
+        for (const item of items) {
+            if (item.type !== "IMAGE" || !item.name) continue;
+            const itemName = item.name.toLowerCase();
+
+            if (itemName.includes("plant_pot_icon") && !processedPotIds.has(item.id)) {
+                pots.push(item);
+            } else {
+                for (const seedKey of Object.keys(SEED_CONFIG)) {
+                    if (itemName.includes(seedKey)) {
+                        seeds.push({ item, config: SEED_CONFIG[seedKey] });
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Если на карте нет одновременно хотя бы одного горшка и семени — выходим
+        if (pots.length === 0 || seeds.length === 0) return;
+
+        // Выполняем замену только от лица GM, чтобы в комнате с несколькими игроками
+        // скрипт не создал дубликаты ростков
+        const role = await OBR.player.getRole();
+        if (role !== "GM") return;
+
+        isPlanting = true;
+        try {
+            const dpi = await OBR.scene.grid.getDpi();
+            const youngTexWidth = 320;
+            const youngTexHeight = 320;
+
+            // Получаем реальные границы каждого горшка на карте
+            const potBoundsMap = new Map();
+            for (const pot of pots) {
+                potBoundsMap.set(pot.id, await OBR.scene.items.getItemBounds([pot.id]));
+            }
+
+            const itemsToDelete = [];
+            const itemsToAdd = [];
+            const usedPotIds = new Set();
+
+            for (const { item: seed, config } of seeds) {
+                const seedBounds = await OBR.scene.items.getItemBounds([seed.id]);
+
+                // Небольшой отступ внутрь (10% от размера семени), чтобы семя
+                // на соседней клетке случайно не сажалось при касании краем сетки
+                const marginX = seedBounds.width * 0.1;
+                const marginY = seedBounds.height * 0.1;
+
+                for (const pot of pots) {
+                    if (usedPotIds.has(pot.id)) continue;
+
+                    const potBounds = potBoundsMap.get(pot.id);
+
+                    // Проверяем пересечение границ семени и горшка
+                    const isTouching =
+                        (seedBounds.min.x + marginX) < potBounds.max.x &&
+                        (seedBounds.max.x - marginX) > potBounds.min.x &&
+                        (seedBounds.min.y + marginY) < potBounds.max.y &&
+                        (seedBounds.max.y - marginY) > potBounds.min.y;
+
+                    if (isTouching) {
+                        usedPotIds.add(pot.id);
+                        processedPotIds.add(pot.id);
+                        setTimeout(() => processedPotIds.delete(pot.id), 5000);
+
+                        // Удаляем и горшок, и потраченное семя
+                        // (Если семя НЕ нужно удалять — оставьте здесь только pot.id)
+                        itemsToDelete.push(pot.id, seed.id);
+
+                        // Вычисляем точный центр горшка для спавна ростка
+                        const potCenter = {
+                            x: (potBounds.min.x + potBounds.max.x) / 2,
+                            y: (potBounds.min.y + potBounds.max.y) / 2
+                        };
+
+                        const youngPlant = buildImage(
+                            {
+                                width: youngTexWidth,
+                                height: youngTexHeight,
+                                url: new URL(config.image, window.location.href).href,
+                                mime: "image/png",
+                            },
+                            {
+                                dpi: dpi,
+                                offset: { x: youngTexWidth / 2, y: youngTexHeight / 2 }
+                            }
+                        )
+                        .position(potCenter)
+                        .scale({ x: dpi / youngTexWidth, y: dpi / youngTexHeight })
+                        .layer("PROP")
+                        .name(config.name)
+                        .description(config.description)
+                        .build();
+
+                        itemsToAdd.push(youngPlant);
+                        console.log(`Автопосадка: ${seed.name} -> ${config.name}`);
+                        break; // Одно семя занимает один горшок
+                    }
+                }
+            }
+
+            if (itemsToDelete.length > 0) {
+                await OBR.scene.items.deleteItems(itemsToDelete);
+            }
+            if (itemsToAdd.length > 0) {
+                await OBR.scene.items.addItems(itemsToAdd);
+            }
+        } catch (err) {
+            console.error("Ошибка автопосадки семян:", err);
+        } finally {
+            isPlanting = false;
         }
     });
 });
