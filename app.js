@@ -270,8 +270,8 @@ OBR.onReady(() => {
             const initialName = initialToken.name.toLowerCase();
             const dpi = await OBR.scene.grid.getDpi();
 
-            const texWidth = 320;
-            const texHeight = 320;
+            const texWidth = 224;
+            const texHeight = 224;
 
             // --- БАМБУК ---
             if (initialName === "bamboo") {
@@ -493,8 +493,8 @@ OBR.onReady(() => {
         isPlanting = true;
         try {
             const dpi = await OBR.scene.grid.getDpi();
-            const youngTexWidth = 320;
-            const youngTexHeight = 320;
+            const youngTexWidth = 224;
+            const youngTexHeight = 224;
 
             // Получаем реальные границы каждого горшка на карте
             const potBoundsMap = new Map();
